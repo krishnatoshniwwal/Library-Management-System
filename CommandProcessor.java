@@ -15,14 +15,15 @@ public class CommandProcessor{
             if (line.isEmpty()){
                 continue;
             }
-            String output = process(line);
-            if (output != null){
-                System.out.println(output);
+            try{
+                System.out.println(process(line));
+            } catch (LibraryException e){
+                System.out.println("ERROR " + e.getMessage());
             }
         }
     }
 
-    private String process(String line){
+    private String process(String line) throws LibraryException{
         String[] parts = line.split("\\|");
         String command = parts[0].trim();
 
@@ -46,16 +47,10 @@ public class CommandProcessor{
             }
             case "BORROW": {
                 Loan loan = library.borrow(parts[1].trim(), parts[2].trim());
-                if (loan == null){
-                    return null;
-                }
                 return "OK due on day " + loan.getDueDay();
             }
             case "RETURN": {
                 int fine = library.returnItem(parts[1].trim());
-                if (fine < 0){
-                    return null;
-                }
                 return "OK fine " + fine;
             }
             case "ADVANCE": {

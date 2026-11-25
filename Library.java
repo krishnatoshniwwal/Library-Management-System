@@ -25,28 +25,18 @@ public class Library{
         members.put(member.getId(), member);
     }
 
-    public Loan borrow(String memberId, String itemId){
-        Member member = members.get(memberId);
-        if (member == null){
-            System.out.println("ERROR member " + memberId + " not found");
-            return null;
-        }
-        LibraryItem item = items.get(itemId);
-        if (item == null){
-            System.out.println("ERROR item " + itemId + " not found");
-            return null;
-        }
+    public Loan borrow(String memberId, String itemId) throws LibraryException{
+        Member member = findMember(memberId);
+        LibraryItem item = findItem(itemId);
+
         if (!item.isBorrowable()){
-            System.out.println("ERROR " + itemId + " cannot be borrowed");
-            return null;
+            throw new ItemNotAvailableException(itemId + " cannot be borrowed");
         }
         if (activeLoans.containsKey(itemId)){
-            System.out.println("ERROR " + itemId + " is on loan");
-            return null;
+            throw new ItemNotAvailableException(itemId + " is on loan");
         }
         if (!member.canBorrow()){
-            System.out.println("ERROR " + memberId + " has reached the limit of " + member.getMaxItems());
-            return null;
+            throw new BorrowLimitExceededException(memberId, member.getMaxItems());
         }
 
         Loan loan = new Loan(item, member, today);
@@ -55,16 +45,14 @@ public class Library{
         return loan;
     }
 
-    public int returnItem(String itemId){
-        if (!items.containsKey(itemId)){
-            System.out.println("ERROR item " + itemId + " not found");
-            return -1;
-        }
+    public int returnItem(String itemId) throws LibraryException{
+        findItem(itemId);
+
         Loan loan = activeLoans.get(itemId);
         if (loan == null){
-            System.out.println("ERROR " + itemId + " is not on loan");
-            return -1;
+            throw new ItemNotOnLoanException(itemId);
         }
+
         int fine = loan.calculateFine(today);
 
         activeLoans.remove(itemId);
@@ -74,10 +62,6 @@ public class Library{
 
     public int advance(int days){
         today = today + days;
-        return today;
-    }
-
-    public int getToday(){
         return today;
     }
 
@@ -94,5 +78,25 @@ public class Library{
             return "AVAILABLE";
         }
         return "ON_LOAN|" + loan.getMember().getId();
+    }
+
+    public int getToday(){
+        return today;
+    }
+
+    private LibraryItem findItem(String id) throws ItemNotFoundException{
+        LibraryItem item = items.get(id);
+        if (item == null){
+            throw new ItemNotFoundException(id);
+        }
+        return item;
+    }
+
+    private Member findMember(String id) throws MemberNotFoundException{
+        Member member = members.get(id);
+        if (member == null){
+            throw new MemberNotFoundException(id);
+        }
+        return member;
     }
 }
