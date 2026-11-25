@@ -15,7 +15,10 @@ public class CommandProcessor{
             if (line.isEmpty()){
                 continue;
             }
-            System.out.println(process(line));
+            String output = process(line);
+            if (output != null){
+                System.out.println(output);
+            }
         }
     }
 
@@ -39,6 +42,19 @@ public class CommandProcessor{
                     return "ERROR unknown member type " + parts[3].trim();
                 }
                 library.addMember(member);
+                return "OK";
+            }
+            case "BORROW": {
+                Loan loan = library.borrow(parts[1].trim(), parts[2].trim());
+                if (loan == null){
+                    return null;
+                }
+                return "OK";
+            }
+            case "RETURN": {
+                if (!library.returnItem(parts[1].trim())){
+                    return null;
+                }
                 return "OK";
             }
             case "INVENTORY": {
