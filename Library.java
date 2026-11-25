@@ -8,11 +8,13 @@ public class Library{
     private Map<String, LibraryItem> items;
     private Map<String, Member> members;
     private Map<String, Loan> activeLoans;
+    private int today;
 
     public Library(){
         items = new TreeMap<>();
         members = new HashMap<>();
         activeLoans = new HashMap<>();
+        today = 0;
     }
 
     public void addItem(LibraryItem item){
@@ -47,25 +49,36 @@ public class Library{
             return null;
         }
 
-        Loan loan = new Loan(item, member, 0);
+        Loan loan = new Loan(item, member, today);
         activeLoans.put(itemId, loan);
         member.addLoan(loan);
         return loan;
     }
 
-    public boolean returnItem(String itemId){
+    public int returnItem(String itemId){
         if (!items.containsKey(itemId)){
             System.out.println("ERROR item " + itemId + " not found");
-            return false;
+            return -1;
         }
         Loan loan = activeLoans.get(itemId);
         if (loan == null){
             System.out.println("ERROR " + itemId + " is not on loan");
-            return false;
+            return -1;
         }
+        int fine = loan.calculateFine(today);
+
         activeLoans.remove(itemId);
         loan.getMember().removeLoan(loan);
-        return true;
+        return fine;
+    }
+
+    public int advance(int days){
+        today = today + days;
+        return today;
+    }
+
+    public int getToday(){
+        return today;
     }
 
     public List<LibraryItem> getInventory(){

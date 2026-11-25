@@ -49,13 +49,18 @@ public class CommandProcessor{
                 if (loan == null){
                     return null;
                 }
-                return "OK";
+                return "OK due on day " + loan.getDueDay();
             }
             case "RETURN": {
-                if (!library.returnItem(parts[1].trim())){
+                int fine = library.returnItem(parts[1].trim());
+                if (fine < 0){
                     return null;
                 }
-                return "OK";
+                return "OK fine " + fine;
+            }
+            case "ADVANCE": {
+                int day = library.advance(Integer.parseInt(parts[1].trim()));
+                return "OK today is day " + day;
             }
             case "INVENTORY": {
                 List<String> lines = new ArrayList<>();
