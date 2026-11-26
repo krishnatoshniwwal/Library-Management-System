@@ -57,6 +57,29 @@ public class CommandProcessor{
                 int day = library.advance(Integer.parseInt(parts[1].trim()));
                 return "OK today is day " + day;
             }
+            case "SEARCH": {
+                List<String> lines = new ArrayList<>();
+                for (LibraryItem item : library.search(parts[1].trim())){
+                    lines.add(item.getId() + "|" + item.getType() + "|" + item.getTitle());
+                }
+                return formatReport(lines);
+            }
+            case "LOANS": {
+                List<String> lines = new ArrayList<>();
+                for (Loan loan : library.getLoansOf(parts[1].trim())){
+                    lines.add(loan.getItem().getId() + "|" + loan.getItem().getTitle() + "|" + loan.getDueDay());
+                }
+                return formatReport(lines);
+            }
+            case "OVERDUE": {
+                int today = library.getToday();
+                List<String> lines = new ArrayList<>();
+                for (Loan loan : library.getOverdueLoans()){
+                    lines.add(loan.getItem().getId() + "|" + loan.getMember().getId() + "|"
+                            + loan.getDaysLate(today) + "|" + loan.calculateFine(today));
+                }
+                return formatReport(lines);
+            }
             case "INVENTORY": {
                 List<String> lines = new ArrayList<>();
                 for (LibraryItem item : library.getInventory()){

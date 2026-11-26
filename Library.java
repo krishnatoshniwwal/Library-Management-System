@@ -1,4 +1,5 @@
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -9,6 +10,28 @@ public class Library{
     private Map<String, Member> members;
     private Map<String, Loan> activeLoans;
     private int today;
+
+    private static final Comparator<LibraryItem> BY_TITLE = (a, b) -> {
+        int result = a.getTitle().compareTo(b.getTitle());
+        if (result != 0){
+            return result;
+        }
+        return a.getId().compareTo(b.getId());
+    };
+
+    private static final Comparator<Loan> BY_DUE_DAY_THEN_ID = (a, b) -> {
+        if (a.getDueDay() != b.getDueDay()){
+            return Integer.compare(a.getDueDay(), b.getDueDay());
+        }
+        return a.getItem().getId().compareTo(b.getItem().getId());
+    };
+
+    private static final Comparator<Loan> BY_DAYS_LATE_THEN_ID = (a, b) -> {
+        if (a.getDueDay() != b.getDueDay()){
+            return Integer.compare(a.getDueDay(), b.getDueDay());
+        }
+        return a.getItem().getId().compareTo(b.getItem().getId());
+    };
 
     public Library(){
         items = new TreeMap<>();
@@ -63,6 +86,36 @@ public class Library{
     public int advance(int days){
         today = today + days;
         return today;
+    }
+
+    public List<LibraryItem> search(String text){
+        String lowerText = text.toLowerCase();
+        List<LibraryItem> result = new ArrayList<>();
+        for (LibraryItem item : items.values()){
+            if (item.getTitle().toLowerCase().contains(lowerText)){
+                result.add(item);
+            }
+        }
+        result.sort(BY_TITLE);
+        return result;
+    }
+
+    public List<Loan> getLoansOf(String memberId) throws MemberNotFoundException{
+        Member member = findMember(memberId);
+        List<Loan> result = new ArrayList<>(member.getLoans());
+        result.sort(BY_DUE_DAY_THEN_ID);
+        return result;
+    }
+
+    public List<Loan> getOverdueLoans(){
+        List<Loan> result = new ArrayList<>();
+        for (Loan loan : activeLoans.values()){
+            if (loan.isOverdue(today)){
+                result.add(loan);
+            }
+        }
+        result.sort(BY_DAYS_LATE_THEN_ID);
+        return result;
     }
 
     public List<LibraryItem> getInventory(){
