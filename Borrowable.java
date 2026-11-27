@@ -1,3 +1,3 @@
-public interface Borrowable {
+public interface Borrowable{
     int getFinePerDay();
 }

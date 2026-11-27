@@ -1,0 +1,20 @@
+OK
+OK
+OK
+OK
+OK due on day 14
+OK due on day 30
+NONE
+OK today is day 14
+OK fine 0
+OK due on day 28
+OK today is day 34
+B1|S1|6|12
+M1|F1|4|4
+OK fine 4
+OK today is day 39
+B1|S1|11|22
+OK fine 22
+NONE
+B1|BOOK|AVAILABLE
+M1|MAGAZINE|AVAILABLE

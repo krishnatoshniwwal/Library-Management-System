@@ -1,0 +1,38 @@
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+OK due on day 14
+OK due on day 14
+OK due on day 14
+ERROR S1 has reached the limit of 3
+OK fine 0
+OK fine 0
+OK fine 0
+ERROR B4 is not on loan
+OK due on day 21
+OK due on day 21
+OK due on day 21
+OK due on day 21
+ERROR T1 has reached the limit of 4
+OK fine 0
+OK fine 0
+OK fine 0
+OK fine 0
+ERROR B5 is not on loan
+OK due on day 30
+OK due on day 30
+OK due on day 30
+OK due on day 30
+OK due on day 30
+ERROR F1 has reached the limit of 5
+B1|Book 1|30
+B2|Book 2|30
+B3|Book 3|30
+B4|Book 4|30
+B5|Book 5|30

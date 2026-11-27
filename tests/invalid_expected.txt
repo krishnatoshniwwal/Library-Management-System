@@ -1,0 +1,12 @@
+ERROR ADD_BOOK needs 3 field(s)
+ERROR title cannot be blank
+OK
+ERROR id B1 already exists
+ERROR unknown member type ALUMNI
+ERROR abc is not a valid number
+ERROR number must be positive: -3
+ERROR number must be positive: 0
+ERROR unknown command FLY
+ERROR search text cannot be blank
+ERROR OVERDUE needs 0 field(s)
+B1|BOOK|AVAILABLE

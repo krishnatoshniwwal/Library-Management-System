@@ -1,0 +1,31 @@
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+ERROR B1 is available
+OK due on day 14
+ERROR S1 already has B1
+OK reserved
+ERROR S2 already reserved B1
+OK reserved
+ERROR R1 cannot be borrowed
+ERROR member X9 not found
+ERROR item B9 not found
+OK due on day 14
+OK due on day 14
+OK due on day 14
+OK today is day 20
+OK fine 12, issued to T1 due on day 41
+B1|Algorithms|41
+OK fine 12
+OK fine 0, issued to S2 due on day 34
+OK fine 0
+B1|BOOK|AVAILABLE
+B2|BOOK|AVAILABLE
+B3|BOOK|ON_LOAN|S2
+B4|BOOK|ON_LOAN|S2
+R1|REFERENCE|NOT_BORROWABLE
