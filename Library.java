@@ -40,11 +40,17 @@ public class Library{
         today = 0;
     }
 
-    public void addItem(LibraryItem item){
+    public void addItem(LibraryItem item) throws DuplicateIdException{
+        if (items.containsKey(item.getId())){
+            throw new DuplicateIdException(item.getId());
+        }
         items.put(item.getId(), item);
     }
 
-    public void addMember(Member member){
+    public void addMember(Member member) throws DuplicateIdException{
+        if (members.containsKey(member.getId())){
+            throw new DuplicateIdException(member.getId());
+        }
         members.put(member.getId(), member);
     }
 

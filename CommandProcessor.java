@@ -24,54 +24,81 @@ public class CommandProcessor{
     }
 
     private String process(String line) throws LibraryException{
-        String[] parts = line.split("\\|");
+        String[] parts = line.split("\\|", -1);
         String command = parts[0].trim();
 
         switch (command){
-            case "ADD_BOOK":
-                library.addItem(new Book(parts[1].trim(), parts[2].trim(), parts[3].trim()));
+            case "ADD_BOOK": {
+                InputValidator.checkFieldCount(parts, 4);
+                String id = InputValidator.requireNonBlank(parts[1], "id");
+                String title = InputValidator.requireNonBlank(parts[2], "title");
+                String author = InputValidator.requireNonBlank(parts[3], "author");
+                library.addItem(new Book(id, title, author));
                 return "OK";
-            case "ADD_MAGAZINE":
-                library.addItem(new Magazine(parts[1].trim(), parts[2].trim(), parts[3].trim()));
+            }
+            case "ADD_MAGAZINE": {
+                InputValidator.checkFieldCount(parts, 4);
+                String id = InputValidator.requireNonBlank(parts[1], "id");
+                String title = InputValidator.requireNonBlank(parts[2], "title");
+                String issue = InputValidator.requireNonBlank(parts[3], "issue");
+                library.addItem(new Magazine(id, title, issue));
                 return "OK";
-            case "ADD_REFERENCE":
-                library.addItem(new ReferenceBook(parts[1].trim(), parts[2].trim(), parts[3].trim()));
+            }
+            case "ADD_REFERENCE": {
+                InputValidator.checkFieldCount(parts, 4);
+                String id = InputValidator.requireNonBlank(parts[1], "id");
+                String title = InputValidator.requireNonBlank(parts[2], "title");
+                String author = InputValidator.requireNonBlank(parts[3], "author");
+                library.addItem(new ReferenceBook(id, title, author));
                 return "OK";
+            }
             case "ADD_MEMBER": {
-                Member member = createMember(parts[1].trim(), parts[2].trim(), parts[3].trim());
-                if (member == null){
-                    return "ERROR unknown member type " + parts[3].trim();
-                }
-                library.addMember(member);
+                InputValidator.checkFieldCount(parts, 4);
+                String id = InputValidator.requireNonBlank(parts[1], "id");
+                String name = InputValidator.requireNonBlank(parts[2], "name");
+                String type = InputValidator.requireNonBlank(parts[3], "type");
+                library.addMember(createMember(id, name, type));
                 return "OK";
             }
             case "BORROW": {
-                Loan loan = library.borrow(parts[1].trim(), parts[2].trim());
+                InputValidator.checkFieldCount(parts, 3);
+                String memberId = InputValidator.requireNonBlank(parts[1], "memberId");
+                String itemId = InputValidator.requireNonBlank(parts[2], "itemId");
+                Loan loan = library.borrow(memberId, itemId);
                 return "OK due on day " + loan.getDueDay();
             }
             case "RETURN": {
-                int fine = library.returnItem(parts[1].trim());
+                InputValidator.checkFieldCount(parts, 2);
+                String itemId = InputValidator.requireNonBlank(parts[1], "itemId");
+                int fine = library.returnItem(itemId);
                 return "OK fine " + fine;
             }
             case "ADVANCE": {
-                int day = library.advance(Integer.parseInt(parts[1].trim()));
+                InputValidator.checkFieldCount(parts, 2);
+                int days = InputValidator.parsePositiveInt(parts[1]);
+                int day = library.advance(days);
                 return "OK today is day " + day;
             }
             case "SEARCH": {
+                InputValidator.checkFieldCount(parts, 2);
+                String text = InputValidator.requireNonBlank(parts[1], "search text");
                 List<String> lines = new ArrayList<>();
-                for (LibraryItem item : library.search(parts[1].trim())){
+                for (LibraryItem item : library.search(text)){
                     lines.add(item.getId() + "|" + item.getType() + "|" + item.getTitle());
                 }
                 return formatReport(lines);
             }
             case "LOANS": {
+                InputValidator.checkFieldCount(parts, 2);
+                String memberId = InputValidator.requireNonBlank(parts[1], "memberId");
                 List<String> lines = new ArrayList<>();
-                for (Loan loan : library.getLoansOf(parts[1].trim())){
+                for (Loan loan : library.getLoansOf(memberId)){
                     lines.add(loan.getItem().getId() + "|" + loan.getItem().getTitle() + "|" + loan.getDueDay());
                 }
                 return formatReport(lines);
             }
             case "OVERDUE": {
+                InputValidator.checkFieldCount(parts, 1);
                 int today = library.getToday();
                 List<String> lines = new ArrayList<>();
                 for (Loan loan : library.getOverdueLoans()){
@@ -81,6 +108,7 @@ public class CommandProcessor{
                 return formatReport(lines);
             }
             case "INVENTORY": {
+                InputValidator.checkFieldCount(parts, 1);
                 List<String> lines = new ArrayList<>();
                 for (LibraryItem item : library.getInventory()){
                     lines.add(item.getId() + "|" + item.getType() + "|" + library.getStatus(item));
@@ -88,11 +116,11 @@ public class CommandProcessor{
                 return formatReport(lines);
             }
             default:
-                return "ERROR unknown command " + command;
+                throw new InvalidInputException("unknown command " + command);
         }
     }
 
-    private Member createMember(String id, String name, String type){
+    private Member createMember(String id, String name, String type) throws InvalidInputException{
         switch (type.toUpperCase()){
             case "STUDENT":
                 return new Student(id, name);
@@ -101,7 +129,7 @@ public class CommandProcessor{
             case "FACULTY":
                 return new Faculty(id, name);
             default:
-                return null;
+                throw new InvalidInputException("unknown member type " + type);
         }
     }
 
