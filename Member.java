@@ -38,4 +38,13 @@ public abstract class Member{
     public List<Loan> getLoans(){
         return loans;
     }
+
+    public boolean holds(String itemId){
+        for (Loan loan : loans){
+            if (loan.getItem().getId().equals(itemId)){
+                return true;
+            }
+        }
+        return false;
+    }
 }

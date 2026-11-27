@@ -1,8 +1,10 @@
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Queue;
 import java.util.TreeMap;
 
 public class Library{
@@ -10,6 +12,7 @@ public class Library{
     private Map<String, Member> members;
     private Map<String, Loan> activeLoans;
     private int today;
+    private Map<String, Queue<Member>> reservations;
 
     private static final Comparator<LibraryItem> BY_TITLE = (a, b) -> {
         int result = a.getTitle().compareTo(b.getTitle());
@@ -37,6 +40,7 @@ public class Library{
         items = new TreeMap<>();
         members = new HashMap<>();
         activeLoans = new HashMap<>();
+        reservations = new HashMap<>();
         today = 0;
     }
 
@@ -86,6 +90,8 @@ public class Library{
 
         activeLoans.remove(itemId);
         loan.getMember().removeLoan(loan);
+
+        issueToNextReserver(loan.getItem());
         return fine;
     }
 
@@ -139,8 +145,54 @@ public class Library{
         return "ON_LOAN|" + loan.getMember().getId();
     }
 
+    public void reserve(String memberId, String itemId) throws LibraryException{
+        Member member = findMember(memberId);
+        LibraryItem item = findItem(itemId);
+
+        if (!item.isBorrowable()){
+            throw new ItemNotAvailableException(itemId + " cannot be borrowed");
+        }
+        if (!activeLoans.containsKey(itemId)){
+            throw new ReservationNotAllowedException(itemId + " is available");
+        }
+        if (member.holds(itemId)){
+            throw new ReservationNotAllowedException(memberId + " already has " + itemId);
+        }
+
+        Queue<Member> queue = reservations.get(itemId);
+        if (queue == null){
+            queue = new LinkedList<>();
+            reservations.put(itemId, queue);
+        }
+        if (queue.contains(member)){
+            throw new ReservationNotAllowedException(memberId + " already reserved " + itemId);
+        }
+        queue.add(member);
+    }
+
+    private Loan issueToNextReserver(LibraryItem item){
+        Queue<Member> queue = reservations.get(item.getId());
+        if (queue == null){
+            return null;
+        }
+        for (Member member : queue){
+            if (member.canBorrow()){
+                queue.remove(member);
+                Loan loan = new Loan(item, member, today);
+                activeLoans.put(item.getId(), loan);
+                member.addLoan(loan);
+                return loan;
+            }
+        }
+        return null;
+    }
+
     public int getToday(){
         return today;
+    }
+
+    public Loan getActiveLoan(String itemId){
+        return activeLoans.get(itemId);
     }
 
     private LibraryItem findItem(String id) throws ItemNotFoundException{

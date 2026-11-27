@@ -71,6 +71,11 @@ public class CommandProcessor{
                 InputValidator.checkFieldCount(parts, 2);
                 String itemId = InputValidator.requireNonBlank(parts[1], "itemId");
                 int fine = library.returnItem(itemId);
+                Loan next = library.getActiveLoan(itemId);
+                if (next != null){
+                    return "OK fine " + fine + ", issued to " + next.getMember().getId()
+                            + " due on day " + next.getDueDay();
+                }
                 return "OK fine " + fine;
             }
             case "ADVANCE": {
@@ -114,6 +119,13 @@ public class CommandProcessor{
                     lines.add(item.getId() + "|" + item.getType() + "|" + library.getStatus(item));
                 }
                 return formatReport(lines);
+            }
+            case "RESERVE": {
+                InputValidator.checkFieldCount(parts, 3);
+                String memberId = InputValidator.requireNonBlank(parts[1], "memberId");
+                String itemId = InputValidator.requireNonBlank(parts[2], "itemId");
+                library.reserve(memberId, itemId);
+                return "OK reserved";
             }
             default:
                 throw new InvalidInputException("unknown command " + command);
