@@ -42,6 +42,6 @@ The class diagram is in `UML.pdf`.
 
 ## Extras beyond the brief
 
-- `RESERVE` command (the optional bonus).
+- `RESERVE` command
 - Input validation (`InputValidator`, `InvalidInputException`).
 - Duplicate-ID checking (`DuplicateIdException`).
